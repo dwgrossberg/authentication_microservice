@@ -17,12 +17,12 @@ CORS(app)
 
 @app.route('/authentication', methods=['POST'])
 @cross_origin()
-def authenticate(IP):
+def authenticate():
     data = request.get_json()  # {IP address}
     with open(data.csv, 'r') as csv_file:
         reader = csv.reader(csv_file)
         for row in reader:
-            if IP in row:
+            if data["IP"] in row:
                 # IP already on file
                 return jsonify({'message': 'Human authenticated'})
     # IP must be authenticated
@@ -31,7 +31,7 @@ def authenticate(IP):
 
 @app.route('/whitelist', methods=['POST'])
 @cross_origin()
-def whitelist(IP):
+def whitelist():
     data = request.get_json()  # {IP address, is_human? <bool>}
     # check for is_human identifier
     if not data['is_human']:
@@ -39,7 +39,7 @@ def whitelist(IP):
     # save IP for future checks
     with open(data.csv, 'w') as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow([IP])
+        writer.writerow([data["IP"]])
     return jsonify({'message': 'Human authenticated'})
 
 
