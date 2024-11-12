@@ -15,16 +15,23 @@ app.config.from_object(Config())
 CORS(app)
 
 
+def check_in_csv(s):
+    with open('data.csv', 'r') as csv_file:
+        reader = csv.reader(csv_file)
+        for row in reader:
+            if s in row:
+                return True
+        return False
+
+
 @app.route('/authentication', methods=['POST'])
 @cross_origin()
 def authenticate():
     data = request.get_json()  # {IP address}
-    with open(data.csv, 'r') as csv_file:
-        reader = csv.reader(csv_file)
-        for row in reader:
-            if data["IP"] in row:
-                # IP already on file
-                return jsonify({'message': 'Human authenticated'})
+    print(data)
+    if check_in_csv(data["IP"]):
+        # IP already on file
+        return jsonify({'message': 'Human authenticated'})
     # IP must be authenticated
     return jsonify({'message': 'Not authenticated'})
 
@@ -37,7 +44,7 @@ def whitelist():
     if not data['is_human']:
         return jsonify({'message': 'Not authenticated'})
     # save IP for future checks
-    with open(data.csv, 'w') as csv_file:
+    with open('data.csv', 'a') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow([data["IP"]])
     return jsonify({'message': 'Human authenticated'})
