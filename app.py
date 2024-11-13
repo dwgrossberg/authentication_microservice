@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 from flask.helpers import send_from_directory
-import csv
+from pymongo_db import PyMongo_DB
 
 
 class Config:
@@ -14,22 +14,15 @@ app.config.from_object(Config())
 
 CORS(app)
 
-
-def check_in_csv(s):
-    with open('data.csv', 'r') as csv_file:
-        reader = csv.reader(csv_file)
-        for row in reader:
-            if s in row:
-                return True
-        return False
+mongo = PyMongo_DB()
+db = mongo.get_database()
 
 
-@app.route('/authentication', methods=['POST'])
+@app.route('/authenticate', methods=['POST'])
 @cross_origin()
 def authenticate():
     data = request.get_json()  # {IP address}
-    print(data)
-    if check_in_csv(data["IP"]):
+    if mongo.check_IP(data["IP"]):
         # IP already on file
         return jsonify({'message': 'Human authenticated'})
     # IP must be authenticated
@@ -44,9 +37,7 @@ def whitelist():
     if not data['is_human']:
         return jsonify({'message': 'Not authenticated'})
     # save IP for future checks
-    with open('data.csv', 'a') as csv_file:
-        writer = csv.writer(csv_file)
-        writer.writerow([data["IP"]])
+    mongo.insert_IP(data["IP"])
     return jsonify({'message': 'Human authenticated'})
 
 
