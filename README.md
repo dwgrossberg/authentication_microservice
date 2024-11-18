@@ -2,7 +2,7 @@
 
 Details on how to use and interact with the microservice.
 
-This ![microservice](https://auth-microservice-f2768dc2c490.herokuapp.com) is hosted on Heroku. The service is a simple API server with two unique POST endpoints:
+This [microservice](https://auth-microservice-f2768dc2c490.herokuapp.com) is hosted on Heroku. The service is a simple API server with two unique POST endpoints:
 
 - /authenticate: used for verifying whether or not a particular client is authenticated to use the site
 - /whitelist: adds a new client (IP address or username) to the authentication db
